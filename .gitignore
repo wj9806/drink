@@ -1,4 +1,3 @@
 .idea
-target
-CMakeFiles
 *.o
+cmake-build-debug
