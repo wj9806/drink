@@ -9,12 +9,12 @@
 
 struct vm {
     //累计已分配的内存量
-    uint32_t allocatedBytes;
-    Parser * curParser;
+    uint32_t allocated_bytes;
+    parser * cur_parser;
 };
 
-void initVm(VM* vm);
+void init_vm(VM* vm);
 
-VM * newVM(void);
+VM * new_vM(void);
 
 #endif //DRINK_VM_H

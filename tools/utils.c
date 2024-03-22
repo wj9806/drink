@@ -14,7 +14,7 @@
 //   3 释放内存 ptr不为null newSize=0
 void* memManager(VM* vm, void* ptr, uint32_t oldSize, uint32_t newSize) {
     //累计系统分配的总内存
-    vm->allocatedBytes += newSize - oldSize;
+    vm->allocated_bytes += newSize - oldSize;
 
     //避免realloc(NULL, 0)定义的新地址,此地址不能被释放
     if (newSize == 0) {
@@ -38,21 +38,21 @@ uint32_t ceilToPowerOf2(uint32_t v) {
     return v;
 }
 
-DEFINE_BUFFER_METHOD(String)
-DEFINE_BUFFER_METHOD(Int)
-DEFINE_BUFFER_METHOD(Char)
-DEFINE_BUFFER_METHOD(Byte)
+DEFINE_BUFFER_METHOD(string)
+DEFINE_BUFFER_METHOD(int)
+DEFINE_BUFFER_METHOD(char)
+DEFINE_BUFFER_METHOD(byte)
 
 void symbolTableClear(VM* vm, SymbolTable* buffer) {
     uint32_t idx = 0;
     while (idx < buffer->count) {
         memManager(vm, buffer->datas[idx++].str, 0, 0);
     }
-    StringBufferClear(vm, buffer);
+    string_buffer_clear(vm, buffer);
 }
 
 //通用报错函数
-void errorReport(void* parser,
+void errorReport(void* parser_ptr,
                  ErrorType errorType, const char* fmt, ...) {
     char buffer[DEFAULT_BUfFER_SIZE] = {'\0'};
     va_list ap;
@@ -69,8 +69,8 @@ void errorReport(void* parser,
         case ERROR_LEX:
         case ERROR_COMPILE:
             ASSERT(parser != NULL, "parser is null!");
-            fprintf(stderr, "%s:%d \"%s\"\n", ((Parser*)parser)->file,
-                    ((Parser*)parser)->preToken.lineNo, buffer);
+            fprintf(stderr, "%s:%d \"%s\"\n", ((parser*)parser_ptr)->file,
+                    ((parser*)parser_ptr)->pre_token.line_no, buffer);
             break;
         case ERROR_RUNTIME:
             fprintf(stderr, "%s\n", buffer);

@@ -7,7 +7,9 @@
 
 #include "common.h"
 
-void* memManager(VM* vm, void* ptr, uint32_t oldSize, uint32_t newSize);
+typedef uint8_t byte;
+
+void* memManager(VM* vm, void* ptr, uint32_t old_size, uint32_t new_size);
 
 #define ALLOCATE(vmPtr, type) \
    (type*)memManager(vmPtr, NULL, 0, sizeof(type))
@@ -28,7 +30,7 @@ uint32_t ceilToPowerOf2(uint32_t v);
 typedef struct {
     char* str;
     uint32_t length;
-} String;
+} string;
 
 typedef struct {
     uint32_t length; //除结束'\0'之外的字符个数
@@ -44,55 +46,53 @@ typedef struct {
       uint32_t count;\
       /*缓冲区容量用*/\
       uint32_t capacity;\
-   } type##Buffer;\
-   void type##BufferInit(type##Buffer* buf);\
-   void type##BufferFillWrite(VM* vm, \
-	 type##Buffer* buf, type data, uint32_t fillCount);\
-   void type##BufferAdd(VM* vm, type##Buffer* buf, type data);\
-   void type##BufferClear(VM* vm, type##Buffer* buf);
+   } type##_buffer;\
+   void type##_buffer_init(type##_buffer* buf);\
+   void type##_buffer_fill_write(VM* vm, \
+	 type##_buffer* buf, type data, uint32_t fill_count);\
+   void type##_buffer_add(VM* vm, type##_buffer* buf, type data);\
+   void type##_buffer_clear(VM* vm, type##_buffer* buf);
 
 //定义buffer方法
 #define DEFINE_BUFFER_METHOD(type)\
-   void type##BufferInit(type##Buffer* buf) {\
+   void type##_buffer_init(type##_buffer* buf) {\
       buf->datas = NULL;\
       buf->count = buf->capacity = 0;\
    }\
 \
-   void type##BufferFillWrite(VM* vm, \
-	 type##Buffer* buf, type data, uint32_t fillCount) {\
-      uint32_t newCounts = buf->count + fillCount;\
-      if (newCounts > buf->capacity) {\
-	 size_t oldSize = buf->capacity * sizeof(type);\
-	 buf->capacity = ceilToPowerOf2(newCounts);\
-	 size_t newSize = buf->capacity * sizeof(type);\
-	 ASSERT(newSize > oldSize, "faint...memory allocate!");\
-	 buf->datas = (type*)memManager(vm, buf->datas, oldSize, newSize);\
+   void type##_buffer_fill_write(VM* vm, \
+	 type##_buffer* buf, type data, uint32_t fill_count) {\
+      uint32_t new_counts = buf->count + fill_count;\
+      if (new_counts > buf->capacity) {\
+	 size_t old_size = buf->capacity * sizeof(type);\
+	 buf->capacity = ceilToPowerOf2(new_counts);\
+	 size_t new_size = buf->capacity * sizeof(type);\
+	 ASSERT(new_size > old_size, "faint...memory allocate!");\
+	 buf->datas = (type*)memManager(vm, buf->datas, old_size, new_size);\
       }\
       uint32_t cnt = 0;\
-      while (cnt < fillCount) {\
+      while (cnt < fill_count) {\
 	 buf->datas[buf->count++] = data;\
 	 cnt++;\
       }\
    }\
 \
-   void type##BufferAdd(VM* vm, type##Buffer* buf, type data) {\
-      type##BufferFillWrite(vm, buf, data, 1);\
+   void type##_buffer_add(VM* vm, type##_buffer* buf, type data) {\
+      type##_buffer_fill_write(vm, buf, data, 1);\
    }\
 \
-   void type##BufferClear(VM* vm, type##Buffer* buf) {\
-      size_t oldSize = buf->capacity * sizeof(buf->datas[0]);\
-      memManager(vm, buf->datas, oldSize, 0);\
-      type##BufferInit(buf);\
+   void type##_buffer_clear(VM* vm, type##_buffer* buf) {\
+      size_t old_size = buf->capacity * sizeof(buf->datas[0]);\
+      memManager(vm, buf->datas, old_size, 0);\
+      type##_buffer_init(buf);\
    }
 
-DECLARE_BUFFER_TYPE(String)
-#define SymbolTable StringBuffer
-typedef uint8_t Byte;
-typedef char Char;
-typedef int Int;
-DECLARE_BUFFER_TYPE(Int)
-DECLARE_BUFFER_TYPE(Char)
-DECLARE_BUFFER_TYPE(Byte)
+DECLARE_BUFFER_TYPE(string)
+DECLARE_BUFFER_TYPE(int)
+DECLARE_BUFFER_TYPE(char)
+DECLARE_BUFFER_TYPE(byte)
+
+#define SymbolTable string_buffer
 
 typedef enum {
     ERROR_IO,

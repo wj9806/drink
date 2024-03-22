@@ -5,8 +5,8 @@
 #ifndef DRINK_CORE_H
 #define DRINK_CORE_H
 
-extern char * rootDir;
+extern char * root_dir;
 
-char * readFile(const char * sourceFile);
+char * read_file(const char * source_file);
 
 #endif //DRINK_CORE_H

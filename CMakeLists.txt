@@ -11,7 +11,11 @@ include_directories(
 )
 
 file(GLOB_RECURSE SOURCE_LIST
-        "*.c" "*.h"
+        "include/*.h"
+        "cli/*.c"
+        "parser/*.c"
+        "tools/*.c"
+        "vm/*.c"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})

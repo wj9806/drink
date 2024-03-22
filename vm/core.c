@@ -7,14 +7,14 @@
 #include <sys/stat.h>
 
 //根目录
-char * rootDir = NULL;
+char * root_dir = NULL;
 
 /**
  * 读取源码文件
  * @param path 源码文件路径
  * @return 源码文件内容
  */
-char * readFile(const char * path)
+char * read_file(const char * path)
 {
     FILE * file = fopen(path, "r");
     if (file == NULL)

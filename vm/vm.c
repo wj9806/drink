@@ -5,18 +5,18 @@
 #include "vm.h"
 #include "utils.h"
 
-void initVm(VM* vm)
+void init_vm(VM* vm)
 {
-    vm->allocatedBytes = 0;
-    vm->curParser = NULL;
+    vm->allocated_bytes = 0;
+    vm->cur_parser = NULL;
 }
 
-VM * newVM(void)
+VM * new_vm(void)
 {
     VM* vm = (VM*) malloc(sizeof (VM));
     if (vm == NULL)
         MEM_ERROR("allocate VM failed");
 
-    initVm(vm);
+    init_vm(vm);
     return vm;
 }

@@ -91,18 +91,39 @@ typedef struct {
     token_type type;
     const char * start;
     uint32_t length;
-    uint32_t lineNo;
-} Token;
+    uint32_t line_no;
+} token;
 
 struct parser {
     const char * file;
     const char * source_code;
     const char * next_char_ptr;
     char cur_char;
-    Token cur_token;
-    Token pre_token;
+    token cur_token;
+    token pre_token;
+
+    //处理内嵌表达式，期望右括号的数量
     int interpolation_expect_right_paren_num;
     VM* vm;
 };
+
+#define PEEK_TOKEN(parser_ptr) parser-parser_ptr->cur_token.type
+
+char look_ahead_char(parser * parser);
+
+void get_next_token(parser * parser);
+
+bool match_token(parser * parser, token_type expected);
+
+void consume_cur_token(parser * parser, token_type expected, const char * errMsg);
+
+void consume_next_token(parser * parser, token_type expected, const char * errMsg);
+
+uint32_t get_byte_num_of_encode_utf8(int value);
+
+uint8_t encode_utf8(uint8_t * buf, int value);
+
+void init_parser(VM* vm, parser * parser, const char * file, const char * source_code);
+
 
 #endif //DRINK_PARSER_H
