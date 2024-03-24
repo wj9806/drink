@@ -15,6 +15,6 @@ struct vm {
 
 void init_vm(VM* vm);
 
-VM * new_vM(void);
+VM * new_vm(void);
 
 #endif //DRINK_VM_H

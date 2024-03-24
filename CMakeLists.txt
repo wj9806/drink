@@ -16,6 +16,7 @@ file(GLOB_RECURSE SOURCE_LIST
         "parser/*.c"
         "tools/*.c"
         "vm/*.c"
+        "include/token.list"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
