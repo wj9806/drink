@@ -9,6 +9,7 @@ void init_vm(VM* vm)
 {
     vm->allocated_bytes = 0;
     vm->cur_parser = NULL;
+    vm->all_objects = NULL;
 }
 
 VM * new_vm(void)
