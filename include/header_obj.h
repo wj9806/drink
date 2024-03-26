@@ -37,9 +37,13 @@ typedef enum {
     VT_OBJ
 } value_type;  //value类型
 
+//通用的值结构
 typedef struct {
+    //值类型
     value_type type;
+    //数值
     union {
+        //数字或者对象
         double num;
         obj_header * objHeader;
     };

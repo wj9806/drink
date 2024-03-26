@@ -35,7 +35,7 @@ typedef struct {
 typedef struct {
     uint32_t length; //除结束'\0'之外的字符个数
     char start[0];  //类似c99中的柔性数组
-} CharValue;  //字符串缓冲区
+} char_value;  //字符串缓冲区
 
 //声明buffer类型
 #define DECLARE_BUFFER_TYPE(type)\
