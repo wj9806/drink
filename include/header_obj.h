@@ -21,12 +21,13 @@ typedef enum {
     OT_THREAD,
 } obj_type;
 
+//对象头
 typedef struct obj_header {
     obj_type type;
     bool is_dark; //是否可达
     class * class; //对象所属的类
     struct obj_header* next;
-} obj_header; //对象头
+} obj_header;
 
 typedef enum {
     VT_UNDEFINED,

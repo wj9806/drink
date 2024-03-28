@@ -16,6 +16,7 @@ file(GLOB_RECURSE SOURCE_LIST
         "parser/*.c"
         "tools/*.c"
         "vm/*.c"
+        "object/*.c"
         "include/token.list"
 )
 

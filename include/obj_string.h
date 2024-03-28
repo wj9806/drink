@@ -7,11 +7,20 @@
 
 #include "header_obj.h"
 
+//×Ö·û´®¶ÔÏó
 typedef struct {
-    obj_header objHeader;
+    obj_header obj_header;
+    //×Ö·û´®hashÖµ
     uint32_t hash_code;
+    //×Ö·û´®ÄÚÈİ
     char_value value;
 } obj_string;
+
+uint32_t hash_string(const char * str, uint32_t length);
+
+void hash_obj_string(obj_string* obj_string);
+
+obj_string * new_obj_string(VM* vm, const char * str, uint32_t length);
 
 
 #endif //DRINK_OBJ_STRING_H
