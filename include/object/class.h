@@ -19,7 +19,7 @@ typedef enum {
 } method_type;
 
 //把值类型转换成值结构
-#define VT_TO_VALUE(vt)  ((value) {vt, {0})
+#define VT_TO_VALUE(vt)  ((value) {vt, {0}})
 
 #define BOOL_TO_VALUE(boolean) (boolean ? VT_TO_VALUE(VT_TRUE) : VT_TO_VALUE(VT_FALSE))
 #define VALUE_TO_BOOL(value) ((value).type == VT_TRUE ? true: false)

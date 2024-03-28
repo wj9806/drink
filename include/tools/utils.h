@@ -95,7 +95,7 @@ DECLARE_BUFFER_TYPE(int)
 DECLARE_BUFFER_TYPE(char)
 DECLARE_BUFFER_TYPE(byte)
 
-#define SymbolTable string_buffer
+#define symbol_table string_buffer
 
 typedef enum {
     ERROR_IO,
@@ -108,7 +108,7 @@ typedef enum {
 void errorReport(void* parser,
                  ErrorType errorType, const char* fmt, ...);
 
-void symbolTableClear(VM*, SymbolTable* buffer);
+void symbolTableClear(VM* vm, symbol_table * buffer);
 
 #define IO_ERROR(...)\
    errorReport(NULL, ERROR_IO, __VA_ARGS__)

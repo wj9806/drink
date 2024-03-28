@@ -43,7 +43,7 @@ DEFINE_BUFFER_METHOD(int)
 DEFINE_BUFFER_METHOD(char)
 DEFINE_BUFFER_METHOD(byte)
 
-void symbolTableClear(VM* vm, SymbolTable* buffer) {
+void symbolTableClear(VM* vm, symbol_table* buffer) {
     uint32_t idx = 0;
     while (idx < buffer->count) {
         memManager(vm, buffer->datas[idx++].str, 0, 0);
