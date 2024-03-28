@@ -8,10 +8,14 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 include_directories(
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
+        ${PROJECT_SOURCE_DIR}/include/cli
+        ${PROJECT_SOURCE_DIR}/include/object
+        ${PROJECT_SOURCE_DIR}/include/parser
+        ${PROJECT_SOURCE_DIR}/include/tools
+        ${PROJECT_SOURCE_DIR}/include/vm
 )
 
 file(GLOB_RECURSE SOURCE_LIST
-        "include/*.h"
         "cli/*.c"
         "parser/*.c"
         "tools/*.c"
