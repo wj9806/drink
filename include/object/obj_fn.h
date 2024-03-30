@@ -8,7 +8,9 @@
 #include "header_obj.h"
 #include "meta_obj.h"
 
-typedef struct {
+#define DEBUG
+
+typedef struct fn_debug {
     char* fn_name;         //函数名
     int_buffer line_no;    //行号
 } fn_debug;
@@ -28,7 +30,7 @@ typedef struct {
     uint32_t upvalue_num;
     //形参个数
     uint8_t arg_num;
-#if DEBUG
+#ifdef DEBUG
     fn_debug * debug;
 #endif
 } obj_fn;
