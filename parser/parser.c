@@ -6,6 +6,7 @@
 #include "utils.h"
 #include <string.h>
 #include <ctype.h>
+#include "class.h"
 
 //关键字、保留字结构
 typedef struct
@@ -289,6 +290,68 @@ static void skip_comment(parser * parser)
     }
 
     skip_blanks(parser);
+}
+
+//十六进制
+static void parse_hex_num(parser * parser)
+{
+    while (isxdigit(parser->cur_char))
+    {
+        get_next_char(parser);
+    }
+}
+
+//十进制
+static void parse_dec_num(parser * parser)
+{
+    while (isdigit(parser->cur_char))
+    {
+        get_next_char(parser);
+    }
+
+    if (parser->cur_char == '.' && isdigit(look_ahead_char(parser)))
+    {
+        get_next_char(parser);
+        while (isdigit(parser->cur_char))
+        {
+            get_next_char(parser);
+        }
+    }
+}
+
+//八进制
+static void parse_oct_num(parser * parser)
+{
+    while (parser->cur_char >= '0' && parser->cur_char < '8')
+    {
+        get_next_char(parser);
+    }
+}
+
+//解析十六进制、十进制、八进制
+static void parse_num(parser * parser)
+{
+    //strtol 可以给定字符串按照给定进制转成长整数
+    //strtod 将字符串转成浮点数
+    if (parser->cur_char == '0' && match_next_char(parser, 'x'))
+    {
+        get_next_char(parser);
+        parse_hex_num(parser);
+        parser->cur_token.value = NUM_TO_VALUE(strtol(parser->cur_token.start, NULL, 16));
+    }
+    else if (parser->cur_char == '0' && isdigit(look_ahead_char(parser)))
+    {
+        parse_oct_num(parser);
+        parser->cur_token.value = NUM_TO_VALUE(strtol(parser->cur_token.start, NULL, 8));
+    }
+    else
+    {
+        parse_oct_num(parser);
+        parser->cur_token.value = NUM_TO_VALUE(strtod(parser->cur_token.start, NULL));
+    }
+
+    parser->cur_token.length = (uint32_t) (parser->next_char_ptr - parser->cur_token.start - 1);
+    parser->cur_token.type = TOKEN_NUM;
 }
 
 //查看下一个字符

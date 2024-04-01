@@ -23,7 +23,7 @@ typedef enum {
 
 #define BOOL_TO_VALUE(boolean) (boolean ? VT_TO_VALUE(VT_TRUE) : VT_TO_VALUE(VT_FALSE))
 #define VALUE_TO_BOOL(value) ((value).type == VT_TRUE ? true: false)
-#define NUM_TO_VALUE(num) ((Value) {VT_NUM, {num}})
+#define NUM_TO_VALUE(num) ((value) {VT_NUM, {num}})
 #define VALUE_TO_NUM(value) value.num
 
 #define OBJ_TO_VALUE(obj_ptr) ({\
