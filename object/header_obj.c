@@ -4,6 +4,8 @@
 #include "header_obj.h"
 #include "vm.h"
 
+DEFINE_BUFFER_METHOD(value)
+
 void init_obj_header(VM* vm, obj_header * obj_header, obj_type obj_type, class* class)
 {
     obj_header->type = obj_type;

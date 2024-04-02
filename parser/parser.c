@@ -7,6 +7,7 @@
 #include <string.h>
 #include <ctype.h>
 #include "class.h"
+#include "header_obj.h"
 
 //关键字、保留字结构
 typedef struct
@@ -234,6 +235,9 @@ static void parse_string(parser * parser)
             byte_buffer_add(parser->vm, &str, parser->cur_char);
         }
     }
+    //字符串对象存储到value中
+    obj_string * objString = new_obj_string(parser->vm, (const char *)str.datas, str.count);
+    parser->cur_token.value = OBJ_TO_VALUE(objString);
     byte_buffer_clear(parser->vm, &str);
 }
 
@@ -336,17 +340,20 @@ static void parse_num(parser * parser)
     if (parser->cur_char == '0' && match_next_char(parser, 'x'))
     {
         get_next_char(parser);
+        //十六进制
         parse_hex_num(parser);
         parser->cur_token.value = NUM_TO_VALUE(strtol(parser->cur_token.start, NULL, 16));
     }
     else if (parser->cur_char == '0' && isdigit(look_ahead_char(parser)))
     {
+        //八进制
         parse_oct_num(parser);
         parser->cur_token.value = NUM_TO_VALUE(strtol(parser->cur_token.start, NULL, 8));
     }
     else
     {
-        parse_oct_num(parser);
+        //十进制
+        parse_dec_num(parser);
         parser->cur_token.value = NUM_TO_VALUE(strtod(parser->cur_token.start, NULL));
     }
 
@@ -522,11 +529,14 @@ void get_next_token(parser * parser)
                 break;
             default:
                 //处理变量及数字
-
                 //如果以字母或者下划线开头，则是变量名
                 if (isalpha(parser->cur_char) || parser->cur_char == '_')
                 {
                     parse_id(parser, TOKEN_UNKNOWN);
+                }
+                else if (isdigit(parser->cur_char))
+                {
+                    parse_num(parser);
                 }
                 else
                 {
@@ -576,7 +586,7 @@ void consume_next_token(parser * parser, token_type expected, const char * errMs
     }
 }
 
-void init_parser(VM* vm, parser * parser, const char * file, const char * source_code)
+void init_parser(VM* vm, parser * parser, const char * file, const char * source_code, obj_module * obj_module)
 {
     parser->file = file;
     parser->source_code = source_code;
@@ -589,4 +599,5 @@ void init_parser(VM* vm, parser * parser, const char * file, const char * source
     parser->pre_token = parser->cur_token;
     parser->interpolation_expect_right_paren_num = 0;
     parser->vm = vm;
+    parser->cur_module = obj_module;
 }

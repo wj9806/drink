@@ -46,7 +46,7 @@ typedef struct {
     union {
         //数字或者对象
         double num;
-        obj_header * objHeader;
+        obj_header * obj_header;
     };
 } value;
 

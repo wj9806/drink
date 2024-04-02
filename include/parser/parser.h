@@ -127,7 +127,7 @@ uint32_t get_byte_num_of_encode_utf8(int value);
 
 uint8_t encode_utf8(uint8_t * buf, int value);
 
-void init_parser(VM* vm, parser * parser, const char * file, const char * source_code);
+void init_parser(VM* vm, parser * parser, const char * file, const char * source_code, obj_module * obj_module);
 
 
 #endif //DRINK_PARSER_H
