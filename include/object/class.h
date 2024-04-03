@@ -36,7 +36,13 @@ typedef enum {
 #define VALUE_TO_OBJ(value) (value.obj_header)
 #define VALUE_TO_OBJSTR(value) ((obj_string*)VALUE_TO_OBJ(value))
 #define VALUE_TO_OBJFN(value) ((obj_fn*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJRANGE(value) ((obj_range*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJINSTANCE(value) ((obj_instance *)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJLIST(value) ((obj_list *)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJMAP(value) ((obj_map *)VALUE_TO_OBJ(value))
 #define VALUE_TO_OBJCLOSURE(value) ((obj_closure*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJTHREAD(value) ((obj_thread*)VALUE_TO_OBJ(value))
+#define VALUE_TO_OBJMODULE(value) ((obj_module*)VALUE_TO_OBJ(value))
 #define VALUE_TO_CLASS(value) ((class*)VALUE_TO_OBJ(value))
 
 #define VALUE_IS_UNDEFINED(value) ((value).type == VT_UNDEFINED)
