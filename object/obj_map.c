@@ -52,9 +52,87 @@ static uint32_t hash_value(value value)
         case VT_OBJ:
             return hash_obj(value.obj_header);
         default:
-            RUN_ERROR("unsupport type hashed");
+            RUN_ERROR("unsupported type hashed");
     }
     return 0;
+}
+
+//增加新的key返回true
+//否则返回false
+static bool add_entry(entry * entries, uint32_t capacity, value key, value value)
+{
+    uint32_t index = hash_value(key) % capacity;
+    while (true)
+    {
+        if (entries[index].key.type == VT_UNDEFINED)
+        {
+            entries[index].key = key;
+            entries[index].value = value;
+            return true;
+        }
+        else if (value_is_equal(entries[index].key, key))
+        {
+            entries[index].value = value;
+            return false;
+        }
+        index = (index + 1) % capacity;
+    }
+}
+
+static void resize_map(VM * vm, obj_map* objMap, uint32_t new_capacity)
+{
+    entry * new_entries = ALLOCATE_ARRAY(vm, entry, new_capacity);
+    uint32_t idx = 0;
+    while (idx < new_capacity)
+    {
+        new_entries[idx].key = VT_TO_VALUE(VT_UNDEFINED);
+        new_entries[idx].value = VT_TO_VALUE(VT_FALSE);
+        idx++;
+    }
+    if (objMap->capacity > 0)
+    {
+        entry * entry_arr = objMap->entries;
+        idx = 0;
+        while (idx < objMap->capacity)
+        {
+            if (entry_arr[idx].key.type != VT_UNDEFINED)
+            {
+                add_entry(new_entries, new_capacity, entry_arr[idx].key, entry_arr[idx].value);
+            }
+            idx++;
+        }
+    }
+
+    //回收
+    DEALLOCATE_ARRAY(vm, objMap->entries, objMap->count);
+    //更新
+    objMap->entries = new_entries;
+    objMap->capacity = new_capacity;
+}
+
+static entry* find_entry(obj_map* objMap, value key)
+{
+    if (objMap->capacity == 0) return NULL;
+
+    uint32_t index = hash_value(key) % objMap->capacity;
+    entry * entry;
+    while (true)
+    {
+        entry = &objMap->entries[index];
+        if (value_is_equal(entry->key, key))
+        {
+            return entry;
+        }
+
+        //探测链断了
+        if (VALUE_IS_UNDEFINED(entry->key) && VALUE_IS_FALSE(entry->value))
+        {
+            return NULL;
+        }
+
+        //探测链未断，继续探测
+        index = (index + 1) % objMap->capacity;
+    }
 }
 
 void map_put(VM* vm, obj_map* obj_map, value key, value value)

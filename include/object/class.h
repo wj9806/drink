@@ -92,4 +92,6 @@ typedef union {
 #define CAPACITY_GROW_FACTOR    4
 #define MIN_CAPACITY            64
 
+bool value_is_equal(value a, value b);
+
 #endif //DRINK_CLASS_H
