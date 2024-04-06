@@ -137,21 +137,67 @@ static entry* find_entry(obj_map* objMap, value key)
 
 void map_put(VM* vm, obj_map* obj_map, value key, value value)
 {
-
+    if (obj_map->count + 1 > obj_map->capacity* MAP_LOAD_PERCENT)
+    {
+        uint32_t new_capacity = obj_map->capacity * CAPACITY_GROW_FACTOR;
+        if (new_capacity < MIN_CAPACITY)
+        {
+            new_capacity = MIN_CAPACITY;
+        }
+        resize_map(vm, obj_map, new_capacity);
+    }
+    if (add_entry(obj_map->entries, obj_map->capacity, key, value))
+    {
+        obj_map->count++;
+    }
 }
 
 value map_get(obj_map* obj_map, value key)
 {
-
+    entry * entry = find_entry(obj_map, key);
+    if(entry == NULL)
+    {
+        return VT_TO_VALUE(VT_UNDEFINED);
+    }
+    return entry->value;
 }
 
 void clear_map(VM * vm, obj_map * obj_map)
 {
-
+    DEALLOCATE_ARRAY(vm, obj_map->entries, obj_map->count);
+    obj_map->entries = NULL;
+    obj_map->capacity = obj_map->count = 0;
 }
 
 value remove_key(VM* vm, obj_map* obj_map, value key)
 {
+    entry * entry = find_entry(obj_map, key);
+    if (entry == NULL)
+    {
+        return VT_TO_VALUE(VT_NULL);
+    }
+    value v = entry->value;
+    entry->key = VT_TO_VALUE(VT_UNDEFINED);
+    entry->value = VT_TO_VALUE(VT_TRUE);
 
+    obj_map->count--;
+    if (obj_map->count == 0)
+    {
+        clear_map(vm, obj_map);
+    }
+    else if(obj_map->capacity / (CAPACITY_GROW_FACTOR) * MAP_LOAD_PERCENT > obj_map->count)
+    {
+        if (obj_map->count > MIN_CAPACITY)
+        {
+            uint32_t new_capacity = obj_map->capacity / CAPACITY_GROW_FACTOR;
+            if (new_capacity < MIN_CAPACITY)
+            {
+                new_capacity = MIN_CAPACITY;
+            }
+            resize_map(vm, obj_map, new_capacity);
+        }
+    }
+
+    return v;
 }
 
