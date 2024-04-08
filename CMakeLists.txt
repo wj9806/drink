@@ -9,6 +9,7 @@ include_directories(
         ${PROJECT_SOURCE_DIR}
         ${PROJECT_SOURCE_DIR}/include
         ${PROJECT_SOURCE_DIR}/include/cli
+        ${PROJECT_SOURCE_DIR}/include/compile
         ${PROJECT_SOURCE_DIR}/include/object
         ${PROJECT_SOURCE_DIR}/include/parser
         ${PROJECT_SOURCE_DIR}/include/tools
@@ -17,6 +18,7 @@ include_directories(
 
 file(GLOB_RECURSE SOURCE_LIST
         "cli/*.c"
+        "compile/*.c"
         "parser/*.c"
         "tools/*.c"
         "vm/*.c"

@@ -5,9 +5,26 @@
 #include "core.h"
 #include "utils.h"
 #include <sys/stat.h>
+#include "class.h"
+#include "obj_map.h"
 
 //根目录
 char * root_dir = NULL;
+
+#define CORE_MODULE  VT_TO_VALUE(VT_NULL)
+
+vm_result execute_module(VM * vm, value module_name, const char * module_code)
+{
+    return VM_RESULT_ERROR;
+}
+
+//编译核心模块
+void build_core(VM * vm)
+{
+    obj_module * core_module = new_obj_module(vm, NULL);
+    map_put(vm, vm->all_modules, CORE_MODULE, OBJ_TO_VALUE(core_module));
+}
+
 
 /**
  * 读取源码文件

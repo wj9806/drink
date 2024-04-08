@@ -7,6 +7,8 @@
 #include "parser.h"
 #include <stdio.h>
 #include <string.h>
+#include "core.h"
+#include "class.h"
 
 static void run_file(const char * path)
 {
@@ -25,29 +27,12 @@ static void run_file(const char * path)
 
     const char * source_code = read_file(path);
 
-    struct parser parser;
-    init_parser(vm, &parser, path, source_code, NULL);
-    #include "token.list"
-
-    while (parser.cur_token.type != TOKEN_EOF)
-    {
-        get_next_token(&parser);
-        printf("%dL: %s [", parser.cur_token.line_no, token_array[parser.cur_token.type]);
-
-        uint32_t idx = 0;
-        while (idx < parser.cur_token.length)
-        {
-            printf("%c", *(parser.cur_token.start+idx++));
-
-        }
-        printf("]\n");
-    }
+    execute_module(vm, OBJ_TO_VALUE(new_obj_string(vm, path, strlen(path))), source_code);
 }
 
 int main(int argc, char** argv)
 {
     if (argc == 1) {
-        ;
     }
     run_file(argv[1]);
     return 0;
