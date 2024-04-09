@@ -15,4 +15,8 @@ vm_result execute_module(VM * vm, value module_name, const char * module_code);
 
 void build_core(VM * vm);
 
+int get_index_from_symbol_table(symbol_table * table, const char * symbol, uint32_t length);
+
+int add_symbol(VM * vm, symbol_table * table, const char * symbol, uint32_t length);
+
 #endif //DRINK_CORE_H

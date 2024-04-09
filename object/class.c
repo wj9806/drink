@@ -3,7 +3,7 @@
 //
 
 #include "class.h"
-#include "string.h"
+#include <string.h>
 #include "obj_range.h"
 
 
@@ -46,4 +46,16 @@ bool value_is_equal(value a, value b)
         return (rga->from == rgb->from && rga->to == rgb->to);
     }
     return false;
+}
+
+//新建一个类
+class * new_raw_class(VM * vm, const char * name, uint32_t field_num)
+{
+    class * clazz = ALLOCATE(vm, class);
+    init_obj_header(vm, &clazz->obj_header, OT_CLASS, NULL);
+    clazz->name = new_obj_string(vm ,name, strlen(name));
+    clazz->field_num = field_num;
+    clazz->super_class = NULL;
+    method_buffer_init(&clazz->methods);
+    return clazz;
 }

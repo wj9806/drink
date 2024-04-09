@@ -7,11 +7,18 @@
 #include <sys/stat.h>
 #include "class.h"
 #include "obj_map.h"
+#include <string.h>
 
 //根目录
 char * root_dir = NULL;
 
 #define CORE_MODULE  VT_TO_VALUE(VT_NULL)
+
+#define RET_VALUE(value) \
+    do{                  \
+        args[0] = value;           \
+        return true;              \
+    } while(0);
 
 vm_result execute_module(VM * vm, value module_name, const char * module_code)
 {
@@ -58,4 +65,32 @@ char * read_file(const char * path)
     file_content[file_size] = '\0';
     fclose(file);
     return file_content;
+}
+
+//从符号表中查询符号，返回索引
+int get_index_from_symbol_table(symbol_table * table, const char * symbol, uint32_t length)
+{
+    ASSERT(length != 0, "length of symbol is 0");
+    int index = 0;
+    while (index < table->count)
+    {
+        if (length == table->datas[index].length && memcmp(table->datas[index].str, symbol, length) == 0)
+        {
+            return index;
+        }
+        index++;
+    }
+    return -1;
+}
+
+int add_symbol(VM * vm, symbol_table * table, const char * symbol, uint32_t length)
+{
+    ASSERT(length != 0, "length of symbol is 0");
+    string str;
+    str.str = ALLOCATE_ARRAY(vm ,char , length + 1);
+    memcpy(str.str, symbol, length);
+    str.str[length] = '\0';
+    str.length = length;
+    string_buffer_add(vm, table, str);
+    return (int)table->count - 1;
 }

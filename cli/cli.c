@@ -1,13 +1,10 @@
 //
 // Created by xsy on 2024/3/21.
 //
-#include "cli.h"
 #include "vm.h"
 #include "core.h"
-#include "parser.h"
 #include <stdio.h>
 #include <string.h>
-#include "core.h"
 #include "class.h"
 
 static void run_file(const char * path)
