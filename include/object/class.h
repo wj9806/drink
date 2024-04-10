@@ -56,8 +56,8 @@ typedef enum {
 #define VALUE_IS_OBJSTR(value) (VALUE_IS_CERTAIN_OBJ(value, OT_STRING))
 #define VALUE_IS_OBJINSTANCE(value) (VALUE_IS_CERTAIN_OBJ(value, OT_INSTANCE))
 #define VALUE_IS_OBJCLOSURE(value) (VALUE_IS_CERTAIN_OBJ(value, OT_CLOSURE))
-#define VALUE_IS_OBJRANGE(value) (VALUE_IS_CERTAIN_OBJ(value, OT_RANGE)
-#define VALUE_IS_OBJCLASS(value) (VALUE_IS_CERTAIN_OBJ(value, OT_CLASS)
+#define VALUE_IS_OBJRANGE(value) (VALUE_IS_CERTAIN_OBJ(value, OT_RANGE))
+#define VALUE_IS_CLASS(value) (VALUE_IS_CERTAIN_OBJ(value, OT_CLASS))
 #define VALUE_IS_0(value) (VALUE_IS_NUM(value) && (value).num == 0)
 
 //原生方法指针
