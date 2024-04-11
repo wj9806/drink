@@ -6,6 +6,7 @@
 #define DRINK_CORE_H
 
 #include "vm.h"
+#include "class.h"
 
 extern char * root_dir;
 
@@ -18,5 +19,9 @@ void build_core(VM * vm);
 int get_index_from_symbol_table(symbol_table * table, const char * symbol, uint32_t length);
 
 int add_symbol(VM * vm, symbol_table * table, const char * symbol, uint32_t length);
+
+void bind_method(VM * vm, class * class, uint32_t index, method th);
+
+void bind_super_class(VM * vm, class * sub_class, class * super_class);
 
 #endif //DRINK_CORE_H

@@ -46,7 +46,7 @@ char * root_dir = NULL;
     method me;                                         \
     me.type = MT_PRIMITIVE;                            \
     me.prim_fn = func;                                 \
-    bind_method(vm, class_ptr, (uint32_t)global_index, method);\
+    bind_method(vm, class_ptr, (uint32_t)global_index, me);\
 }
 
 // !object object取反，返回false
@@ -59,6 +59,12 @@ static bool prim_object_not(VM *vm UNUSED, value * args)
 static bool prim_object_equal(VM *vm UNUSED, value * args)
 {
     value bool_value = BOOL_TO_VALUE(value_is_equal(args[0], args[1]));
+    RET_VALUE(bool_value);
+}
+
+static bool prim_object_not_equal(VM *vm UNUSED, value * args)
+{
+    value bool_value = BOOL_TO_VALUE(!value_is_equal(args[0], args[1]));
     RET_VALUE(bool_value);
 }
 
@@ -127,16 +133,57 @@ static bool prim_objectmata_same(VM * vm UNUSED, value * args)
     RET_VALUE(bool_value);
 }
 
+static class * define_class(VM * vm, obj_module* objModule, const char * name)
+{
+    class * clz = new_raw_class(vm, name, 0);
+
+    define_module_var(vm, objModule, name, strlen(name), OBJ_TO_VALUE(clz));
+    return clz;
+}
+
 vm_result execute_module(VM * vm, value module_name, const char * module_code)
 {
     return VM_RESULT_ERROR;
 }
 
-//编译核心模块
+/**
+ * 编译核心模块
+ * 对象调用实例方法，运行时系统会在对象所属的类的方法集合中查找方法
+ * 类调用发发，运行时系统会在类的meta-class的方法集合中查找
+ */
 void build_core(VM * vm)
 {
     obj_module * core_module = new_obj_module(vm, NULL);
     map_put(vm, vm->all_modules, CORE_MODULE, OBJ_TO_VALUE(core_module));
+
+    //对象的基类（所有类的父类）
+    vm->object_class = define_class(vm, core_module, "object");
+    PRIM_METHOD_BIND(vm->object_class, "!", prim_object_not);
+    PRIM_METHOD_BIND(vm->object_class, "==(_)", prim_object_equal);
+    PRIM_METHOD_BIND(vm->object_class, "!=(_)", prim_object_not_equal);
+    PRIM_METHOD_BIND(vm->object_class, "is(_)", prim_object_is);
+    PRIM_METHOD_BIND(vm->object_class, "to_string", prim_object_to_string);
+    PRIM_METHOD_BIND(vm->object_class, "type", prim_object_type);
+
+    //元信息类，它是所有meta-class的类
+    vm->class_of_class = define_class(vm, core_module, "class");
+    bind_super_class(vm, vm->class_of_class, vm->object_class);
+
+    PRIM_METHOD_BIND(vm->class_of_class, "name", prim_class_name);
+    PRIM_METHOD_BIND(vm->class_of_class, "super_type", prim_class_supertype);
+    PRIM_METHOD_BIND(vm->class_of_class, "to_string", prim_class_to_string);
+
+    //元信息，可以通过类调用方法
+    class * object_meta_class = define_class(vm, core_module, "object_meta");
+
+    bind_super_class(vm, object_meta_class, vm->class_of_class);
+    PRIM_METHOD_BIND(object_meta_class, "same(_,_)", prim_objectmata_same);
+
+    vm->object_class->obj_header.class = object_meta_class;
+    object_meta_class->obj_header.class = vm->class_of_class;
+    //让元信息类对象头指向自己
+    vm->class_of_class->obj_header.class = vm->class_of_class;
+
 }
 
 
@@ -190,6 +237,7 @@ int get_index_from_symbol_table(symbol_table * table, const char * symbol, uint3
     return -1;
 }
 
+//往table中添加符号symbol，返回其索引
 int add_symbol(VM * vm, symbol_table * table, const char * symbol, uint32_t length)
 {
     ASSERT(length != 0, "length of symbol is 0");
@@ -200,4 +248,28 @@ int add_symbol(VM * vm, symbol_table * table, const char * symbol, uint32_t leng
     str.length = length;
     string_buffer_add(vm, table, str);
     return (int)table->count - 1;
+}
+
+//使class->methods.datas[index] = method;
+void bind_method(VM * vm, class * class, uint32_t index, method th)
+{
+    if (index >= class->methods.count)
+    {
+        method empty_pad = {MT_NONE, {0}};
+        method_buffer_fill_write(vm, &class->methods, empty_pad, index - class->methods.count + 1);
+    }
+    class->methods.datas[index] = th;
+}
+
+void bind_super_class(VM * vm, class * sub_class, class * super_class)
+{
+    sub_class->super_class = sub_class;
+    sub_class->field_num += super_class->field_num;
+    uint32_t idx = 0;
+    while (idx < super_class->methods.count)
+    {
+        //继承父类的方法
+        bind_method(vm, sub_class, idx, super_class->methods.datas[idx]);
+        idx++;
+    }
 }

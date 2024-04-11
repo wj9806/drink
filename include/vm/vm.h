@@ -17,7 +17,7 @@ typedef enum {
 
 struct vm {
     class * class_of_class;
-    class * objet_class;
+    class * object_class;
     class * string_class;
     class * fn_class;
     class * list_class;
