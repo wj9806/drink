@@ -141,8 +141,51 @@ static class * define_class(VM * vm, obj_module* objModule, const char * name)
     return clz;
 }
 
+static obj_module * get_module(VM * vm, value module_name)
+{
+    value v = map_get(vm->all_modules, module_name);
+    if (v.type == VT_UNDEFINED)
+    {
+        return NULL;
+    }
+
+    return VALUE_TO_OBJMODULE(v);
+}
+
+//载入模块并编译
+static obj_thread * load_module(VM * vm, value module_name, const char * module_core)
+{
+    obj_module * module = get_module(vm, module_name);
+    if (module == NULL)
+    {
+        obj_string * mod_name = VALUE_TO_OBJSTR(module_name);
+        ASSERT(mod_name->value.start[mod_name->value.length] == '\0', "string.value.start is not terminated");
+
+        //创建新的模块
+        module = new_obj_module(vm, mod_name->value.start);
+        map_put(vm, vm->all_modules, module_name, OBJ_TO_VALUE(module));
+
+        //获取核心模块
+        obj_module * core_module = get_module(vm, CORE_MODULE);
+        uint32_t idx = 0;
+        while (idx < core_module->module_var_name.count)
+        {
+            //把核心模块的变量重新定义到模块module中，以实现继承
+            define_module_var(vm, module, core_module->module_var_name.datas[idx].str,
+                              strlen(core_module->module_var_name.datas[idx].str),
+                              core_module->module_var_value.datas[idx]);
+            idx++;
+        }
+    }
+    obj_fn * fn = compile_module(vm ,module, module_core);
+    obj_closure * objClosure = new_obj_closure(vm, fn);
+    obj_thread * module_thread = new_obj_thread(vm, objClosure);
+    return module_thread;
+}
+
 vm_result execute_module(VM * vm, value module_name, const char * module_code)
 {
+    obj_thread * objThread = load_module(vm, module_name, module_code);
     return VM_RESULT_ERROR;
 }
 

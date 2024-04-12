@@ -65,3 +65,8 @@ int define_module_var(VM * vm, obj_module* objModule, const char * name, uint32_
 
     return symbol_index;
 }
+
+obj_fn * compile_module(VM* vm, obj_module * objModule, const char * module_core)
+{
+    ;
+}
