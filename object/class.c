@@ -59,3 +59,20 @@ class * new_raw_class(VM * vm, const char * name, uint32_t field_num)
     method_buffer_init(&clazz->methods);
     return clazz;
 }
+
+class * get_class_obj(VM * vm, value object)
+{
+    switch (object.type) {
+        case VT_NULL:
+            return vm->null_class;
+        case VT_TRUE:
+        case VT_FALSE:
+            return vm->bool_class;
+        case VT_NUM:
+            return vm->num_class;
+        case VT_OBJ:
+            return VALUE_TO_OBJ(object)->class;
+        default:
+            NOT_REACHED();
+    }
+}

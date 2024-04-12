@@ -11,6 +11,10 @@ static void run_file(const char * path)
 {
     //strrchr 搜索最后一次出现字符，指针并指向该字符
     const char * last_slash = strrchr(path, '/');
+    if (last_slash == NULL)
+    {
+        last_slash = strrchr(path, '\\');
+    }
     if (last_slash != NULL)
     {
         char * root = (char *) malloc(last_slash - path + 2);

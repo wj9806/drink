@@ -98,21 +98,6 @@ bool value_is_equal(value a, value b);
 class * new_raw_class(VM * vm, const char * name, uint32_t field_num);
 
 //获取对象所属类
-inline class * get_class_obj(VM * vm, value object)
-{
-    switch (object.type) {
-        case VT_NULL:
-            return vm->null_class;
-        case VT_TRUE:
-        case VT_FALSE:
-            return vm->bool_class;
-        case VT_NUM:
-            return vm->num_class;
-        case VT_OBJ:
-            return VALUE_TO_OBJ(object)->class;
-        default:
-            NOT_REACHED();
-    }
-}
+class * get_class_obj(VM * vm, value object);
 
 #endif //DRINK_CLASS_H

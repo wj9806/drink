@@ -10,6 +10,12 @@
 #include "obj_map.h"
 #include "obj_thread.h"
 
+#define OPCODE_SLOTS(opcode, effect) OPCODE_##opcode,
+typedef enum {
+    #include "opcode.inc"
+} op_code;
+#undef OPCODE_SLOTS
+
 typedef enum {
     VM_RESULT_SUCCESS,
     VM_RESULT_ERROR,

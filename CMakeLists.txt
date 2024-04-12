@@ -24,6 +24,7 @@ file(GLOB_RECURSE SOURCE_LIST
         "vm/*.c"
         "object/*.c"
         "include/token.list"
+        "include/vm/*.inc"
 )
 
 add_executable(${PROJECT_NAME} ${SOURCE_LIST})
