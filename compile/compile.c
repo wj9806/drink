@@ -9,27 +9,6 @@
 #include "core.h"
 #include "class.h"
 
-struct compile_unit {
-    //所编译的函数
-    obj_fn * fn;
-    local_var local_vars[MAX_LOCAL_VAR_NUM];
-    //已分配的局部变量个数
-    uint32_t local_var_num;
-    //记录本层函数所引用的up_value
-    up_value up_values[MAX_UPVALUE_NUM];
-    //当前代码所处的作用域
-    int scope_depth;
-    //当前使用的slot个数
-    uint32_t stack_slot_num;
-    //当前正在编译的循环曾
-    loop * cur_loop;
-    //当前正编译的类的编译信息
-    class_book_keep enclosing_class_bk;
-    //包含此编译单元的编译单元c
-    struct compile_unit* enclosing_unit;
-    parser * cur_parser;
-};
-
 int define_module_var(VM * vm, obj_module* objModule, const char * name, uint32_t length, value value)
 {
     if (length > MAX_ID_LEN)

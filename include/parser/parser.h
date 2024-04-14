@@ -8,6 +8,7 @@
 #include "vm.h"
 #include "common.h"
 #include "meta_obj.h"
+#include "compile.h"
 
 typedef enum
 {
@@ -105,9 +106,11 @@ struct parser {
     token pre_token;
     //当前正在编译的模块
     obj_module * cur_module;
+    compile_unit * cur_compile_unit;
 
     //处理内嵌表达式，期望右括号的数量
     int interpolation_expect_right_paren_num;
+    struct parser * parser;
     VM* vm;
 };
 

@@ -8,6 +8,7 @@
 #include <ctype.h>
 #include "class.h"
 #include "header_obj.h"
+#include "compile.h"
 
 //关键字、保留字结构
 typedef struct
@@ -38,6 +39,49 @@ keyword_token keywords_token[] = {
         {"import",       6,      TOKEN_IMPORT},
         {NULL,       0,      TOKEN_UNKNOWN},
 };
+
+#define OPCODE_SLOTS(op_code, effect) effect,
+static const int op_code_slots_used[] = {
+#include "opcode.inc"
+};
+#undef OPCODE_SLOTS
+
+//初始化compile_unit函数
+static void init_compile_unit(parser * parser, compile_unit * cu,
+                              compile_unit * enclosing_unit, bool is_method)
+{
+    parser->cur_compile_unit = cu;
+    cu->cur_parser = parser;
+    cu->enclosing_unit = enclosing_unit;
+    cu->cur_loop = NULL;
+    cu->enclosing_class_bk = NULL;
+    if (enclosing_unit == NULL)
+    {
+        cu->scope_depth = -1;
+        cu->local_var_num = 0;
+    }
+    else
+    {
+        if (is_method)
+        {
+            cu->local_vars[0].name = "this";
+            cu->local_vars[0].length = 4;
+        }
+        else
+        {
+            cu->local_vars[0].name = NULL;
+            cu->local_vars[0].length = 0;
+        }
+        cu->local_vars[0].scope_depth = -1;
+        cu->local_vars[0].is_upvalue = false;
+        cu->local_var_num = 1;
+        cu->scope_depth = 0;
+    }
+
+    cu->stack_slot_num = cu->local_var_num;
+    cu->fn = new_obj_fn(cu->cur_parser->vm,
+                        cu->cur_parser->cur_module, cu->local_var_num);
+}
 
 static token_type id_or_keyword(const char * start, uint8_t length)
 {
