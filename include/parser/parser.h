@@ -110,7 +110,7 @@ struct parser {
 
     //处理内嵌表达式，期望右括号的数量
     int interpolation_expect_right_paren_num;
-    struct parser * parser;
+    struct parser * parent;
     VM* vm;
 };
 

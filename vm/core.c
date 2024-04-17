@@ -9,6 +9,7 @@
 #include "obj_map.h"
 #include <string.h>
 #include "compile.h"
+#include "core.script.inc"
 
 //根目录
 char * root_dir = NULL;
@@ -226,6 +227,8 @@ void build_core(VM * vm)
     object_meta_class->obj_header.class = vm->class_of_class;
     //让元信息类对象头指向自己
     vm->class_of_class->obj_header.class = vm->class_of_class;
+
+    execute_module(vm, CORE_MODULE, coreModuleCode);
 
 }
 

@@ -99,10 +99,10 @@ struct compile_unit {
     parser * cur_parser;
 };
 
-typedef struct compile_unit compile_unit;
+typedef struct compile_unit  compile_unit;
 
 int define_module_var(VM * vm, obj_module* objModule, const char * name, uint32_t length, value value);
 
-obj_fn * compile_module(VM* vm, obj_module * objModule, const char * module_core);
+obj_fn * compile_module(VM* vm, obj_module * objModule, const char * module_code);
 
 #endif //DRINK_COMPILE_H
