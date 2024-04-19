@@ -10,6 +10,48 @@
 #include "class.h"
 #include "parser.h"
 
+//操作符的绑定权值，及优先级
+typedef enum
+{
+    BP_NONE,
+    BP_LOWEST,
+    BP_ASSIGN,  // =
+    BP_CONDITION, // ? :
+    BP_LOGIC_OR, // ||
+    BP_LOGIC_AND, // &&
+    BP_EQUAL, //== !=
+    BP_IS, // is
+    BP_CMP, // <> <= >=
+    BP_BIT_OR, // |
+    BP_BIT_AND, // &
+    BP_BIT_SHIFT, //<< >>
+    BP_RANGE, // ..
+    BP_TERM, // + -
+    BP_FACTOR,// * / %
+    BP_UNARY, // - ! ~
+    BP_CALL, // . () []
+    BP_HIGHEST
+} bind_power;
+
+typedef void (*denotation_fn) (compile_unit * cu, bool can_assign);
+
+typedef void (*method_signature_fn) (compile_unit * cu, signature * signature);
+
+//符号绑定规则
+typedef struct {
+    //id
+    const char * id;
+    //左绑定权值，不关注左边操作数的符号此值为0
+    bind_power lbp;
+    //字面量、变量、前缀运算符等不关注左操作数的token调用的方法
+    denotation_fn nud;
+    //中缀运算符等关注左操作数的token调用的方法
+    denotation_fn led;
+    //表示奔赴好在类中被视为一个方法
+    //为其生成一个方法签名
+    method_signature_fn method_sign;
+} symbol_bind_rule;
+
 int define_module_var(VM * vm, obj_module* objModule, const char * name, uint32_t length, value value)
 {
     if (length > MAX_ID_LEN)
@@ -167,3 +209,48 @@ obj_fn * compile_module(VM* vm, obj_module * objModule, const char * module_code
 
     exit(0);
 }
+
+//添加常量并返回索引
+static uint32_t add_constant(compile_unit * cu, value constant)
+{
+    value_buffer_add(cu->cur_parser->vm, &cu->fn->constants, constant);
+    return cu->fn->constants.count - 1;
+}
+
+//生成加载常量的指令
+static void emit_load_constant(compile_unit * cu, value value)
+{
+    int index = add_constant(cu, value);
+    write_opcode_short_operand(cu, OPCODE_LOAD_CONSTANT, index);
+}
+
+//数字和字符串.nud() 编译字面量
+static void literal(compile_unit * cu, bool can_assign UNUSED)
+{
+    emit_load_constant(cu, cu->cur_parser->pre_token.value);
+}
+
+//不关注左操作数的符号称作前缀符号
+#define PREFIX_SYMBOL(nud)  {NULL, BP_NONE, nud, NULL, NULL}
+
+//前缀运算符
+#define PREFIX_OPERATOR(id) {id, BP_NONE, unary_operator, NULL, unary_method_signature}
+
+//关注左操作数的符号称为中缀符号
+#define INFIX_SYMBOL(lbp, led) {NULL , lbp , NULL , led, NULL)
+
+//中缀运算符
+#define INFIX_OPERATOR(id, lbp) {id, lbp, NULL, infix_operator, infix_method_signature)
+
+//可做前缀又可做中缀的运算符，如－
+#define MIX_OPERATOR(id) {id, BP_TERM, unary_operator, infix_operator, mix_method_signature)
+
+//占位
+#define UNUSED_RULE {NULL , BP_NONE , NULL , NULL, NULL}
+
+//注册符号的语法和语义分析函数
+symbol_bind_rule RULES[] = {
+        UNUSED_RULE,
+        PREFIX_SYMBOL(literal),
+        PREFIX_SYMBOL(literal),
+};
